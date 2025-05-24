@@ -1,0 +1,20 @@
+{
+  "name": "credit-card-validator",
+  "version": "1.0.0",
+  "description": "A project to validate credit card numbers for commonly used card brands.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "credit",
+    "card",
+    "validator",
+    "luhn"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "credit-card-validator": "file:"
+  }
+}

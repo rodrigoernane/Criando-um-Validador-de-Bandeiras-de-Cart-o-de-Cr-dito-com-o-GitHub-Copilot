@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+	<meta charset="UTF-8">
+	<title>Validador de Cartão de Crédito</title>
+	<style>
+		body { font-family: sans-serif; margin: 2rem; }
+		#result { margin-top: 1rem; }
+		.brand-icon { width: 50px; vertical-align: middle; margin-right: 0.5rem; }
+	</style>
+</head>
+<body>
+	<h1>Validador de Cartão de Crédito</h1>
+	<input type="text" id="cardInput" placeholder="Digite o número do cartão" />
+	<button id="validateBtn">Validar</button>
+	<div id="result">
+		<!-- ...resultado exibido aqui... -->
+	</div>
+
+	<script>
+		// Realiza o algoritmo de Luhn para validar o número do cartão
+		function luhnCheck(cardNum) {
+			let sum = 0;
+			let shouldDouble = false;
+			for (let i = cardNum.length - 1; i >= 0; i--) {
+				let digit = parseInt(cardNum.charAt(i));
+				if (shouldDouble) {
+					digit *= 2;
+					if (digit > 9) digit -= 9;
+				}
+				sum += digit;
+				shouldDouble = !shouldDouble;
+			}
+			return sum % 10 === 0;
+		}
+
+		// Detecta a bandeira do cartão com base em regex simplificado
+		function detectCardBrand(cardNum) {
+			// Remove espaços e traços
+			cardNum = cardNum.replace(/\D/g, '');
+			if (/^4/.test(cardNum)) {
+				// Pode ser Visa ou Visa Electron
+				if (/^(4026|417500|4508|4844|4913|4917)/.test(cardNum)) return 'Visa Electron';
+				return 'Visa';
+			} else if (/^5[1-5]/.test(cardNum)) {
+				return 'MasterCard';
+			} else if (/^3[47]/.test(cardNum)) {
+				return 'American Express';
+			} else if (/^6(?:011|5)/.test(cardNum)) {
+				return 'Discover';
+			} else if (/^3(?:0[0-5]|[68])/.test(cardNum)) {
+				return 'Diners Club';
+			} else if (/^(?:2131|1800|35\d{3})/.test(cardNum)) {
+				return 'JCB';
+			} else if (/^62/.test(cardNum)) {
+				return 'UnionPay';
+			} else if (/^(5018|5020|5038|6304|6759|676[1-3])/.test(cardNum)) {
+				return 'Maestro';
+			} else if (/^5067/.test(cardNum)) {
+				return 'Elo';
+			}
+			return 'Desconhecida';
+		}
+
+		// Mapeamento das bandeiras para os ícones (imagens devem estar na pasta assets)
+		const brandIcons = {
+			'Visa': 'assets/visa.png',
+			'MasterCard': 'assets/mastercard.png',
+			'American Express': 'assets/amex.png',
+			'Discover': 'assets/discover.png',
+			'Diners Club': 'assets/diners.png',
+			'JCB': 'assets/jcb.png',
+			'UnionPay': 'assets/unionpay.png',
+			'Maestro': 'assets/maestro.png',
+			'Visa Electron': 'assets/electron.png',
+			'Elo': 'assets/elo.png',
+			'Desconhecida': 'assets/default.png'
+		};
+
+		document.getElementById('validateBtn').addEventListener('click', function() {
+			const input = document.getElementById('cardInput').value;
+			const cleanNum = input.replace(/\D/g, '');
+			const isValid = luhnCheck(cleanNum);
+			const brand = detectCardBrand(cleanNum);
+			const iconSrc = brandIcons[brand] || brandIcons['Desconhecida'];
+
+			const resultDiv = document.getElementById('result');
+			resultDiv.innerHTML = `
+				<img src="${iconSrc}" alt="${brand}" class="brand-icon" />
+				<strong>Bandeira:</strong> ${brand} <br />
+				<strong>Valido:</strong> ${isValid ? 'Sim' : 'Não'}
+			`;
+		});
+	</script>
+</body>
+</html>
